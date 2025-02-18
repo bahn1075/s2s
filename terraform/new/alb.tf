@@ -93,7 +93,7 @@ resource "aws_route53_record" "cozy_cert_validation" {
     }
   }
 
-  zone_id = aws_route53_zone.cozy_zone.zone_id
+  zone_id = aws_route53_zone.cozy_tf_dunn_link.zone_id  # route53.tf 파일에서 선언된 리소스를 참조
   name    = each.value.name
   type    = each.value.type
   records = [each.value.record]
