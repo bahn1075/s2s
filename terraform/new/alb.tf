@@ -70,13 +70,8 @@ resource "aws_lb_target_group_attachment" "cozy_gitlab_tg_attachment" {
 
 # ACM 퍼블릭 인증서 요청
 resource "aws_acm_certificate" "cozy_cert" {
-  domain_name       = "cozy.tf-dunn.link"
+  domain_name       = "*.cozy.tf-dunn.link"
   validation_method = "DNS"
-
-  subject_alternative_names = [
-    "jenkins.cozy.tf-dunn.link",
-    "gitlab.cozy.tf-dunn.link"
-  ]
 
   tags = {
     Name    = "cozy-cert"
