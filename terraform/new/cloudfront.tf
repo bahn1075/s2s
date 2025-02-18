@@ -1,6 +1,8 @@
 # S3 버킷 생성
 resource "aws_s3_bucket" "cozy_bucket" {
   bucket = "cozy-s3-bucket"
+  acl    = "private"
+
   tags = {
     Name    = "cozy-s3-bucket"
     Creator = "cozy"
@@ -41,6 +43,8 @@ resource "aws_cloudfront_distribution" "cozy_distribution" {
   is_ipv6_enabled     = true
   comment             = "Cozy CloudFront Distribution"
   default_root_object = "index.html"
+
+  aliases = ["cozy.tf-dunn.link"]
 
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD"]
