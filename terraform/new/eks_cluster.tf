@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "ap-northeast-2"
-}
-
 # 기존 VPC와 서브넷을 참조
 data "aws_vpc" "cozy_vpc" {
   filter {
@@ -10,17 +6,17 @@ data "aws_vpc" "cozy_vpc" {
   }
 }
 
-data "aws_subnet" "cozy_private_sbn_01a" {
+data "aws_subnet" "cozy_private_subnet_a" {
   filter {
     name   = "tag:Name"
-    values = ["cozy-private-sbn-01a"]
+    values = ["cozy-private-subnet-a"]
   }
 }
 
-data "aws_subnet" "cozy_private_sbn_01b" {
+data "aws_subnet" "cozy_private_subnet_b" {
   filter {
     name   = "tag:Name"
-    values = ["cozy-private-sbn-01b"]
+    values = ["cozy-private-subnet-b"]
   }
 }
 
@@ -32,8 +28,8 @@ resource "aws_eks_cluster" "cluster" {
 
   vpc_config {
     subnet_ids = [
-      data.aws_subnet.cozy_private_sbn_01a.id,
-      data.aws_subnet.cozy_private_sbn_01b.id
+      data.aws_subnet.cozy_private_subnet_a.id,
+      data.aws_subnet.cozy_private_subnet_b.id
     ]
   }
 
@@ -101,8 +97,8 @@ resource "aws_eks_node_group" "node_group" {
   node_group_name = "cozy-eks-node-group"
   node_role_arn   = aws_iam_role.eks_node_role.arn
   subnet_ids      = [
-    data.aws_subnet.cozy_private_sbn_01a.id,
-    data.aws_subnet.cozy_private_sbn_01b.id
+    data.aws_subnet.cozy_private_subnet_a.id,
+    data.aws_subnet.cozy_private_subnet_b.id
   ]
   instance_types  = ["t3.medium"]
 
