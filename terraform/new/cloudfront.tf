@@ -1,8 +1,10 @@
 # S3 버킷 생성
 resource "aws_s3_bucket" "cozy_bucket" {
-  bucket = "cozy-bucket" 
+  bucket = "cozy-s3-bucket"
+  acl    = "private"
+
   tags = {
-    Name    = "cozy-bucket"
+    Name    = "cozy-s3-bucket"
     Creator = "cozy"
   }
 }
@@ -16,7 +18,9 @@ resource "aws_s3_bucket_policy" "cozy_bucket_policy" {
     Statement = [
       {
         Effect = "Allow",
-        Principal = "*",
+        Principal = {
+          AWS = "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${aws_cloudfront_origin_access_identity.cozy_identity.id}"
+        },
         Action = "s3:GetObject",
         Resource = "${aws_s3_bucket.cozy_bucket.arn}/*"
       }
@@ -28,7 +32,7 @@ resource "aws_s3_bucket_policy" "cozy_bucket_policy" {
 resource "aws_cloudfront_distribution" "cozy_distribution" {
   origin {
     domain_name = aws_s3_bucket.cozy_bucket.bucket_regional_domain_name
-    origin_id   = "S3-cozy-bucket"
+    origin_id   = "S3-cozy-s3-bucket"
 
     s3_origin_config {
       origin_access_identity = aws_cloudfront_origin_access_identity.cozy_identity.cloudfront_access_identity_path
@@ -43,7 +47,7 @@ resource "aws_cloudfront_distribution" "cozy_distribution" {
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD"]
     cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "S3-cozy-bucket"
+    target_origin_id = "S3-cozy-s3-bucket"
 
     forwarded_values {
       query_string = false
@@ -70,7 +74,7 @@ resource "aws_cloudfront_distribution" "cozy_distribution" {
   viewer_certificate {
     acm_certificate_arn = "arn:aws:acm:us-east-1:151564769076:certificate/a9a6646f-9d74-40bc-b9be-ca9dabf6d4f9"
     ssl_support_method  = "sni-only"
-    minimum_protocol_version = "TLSv1.2_2019"
+    minimum_protocol_version = "TLSv1.2_2021"
   }
 
   tags = {
