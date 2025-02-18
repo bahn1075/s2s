@@ -2,13 +2,17 @@
 resource "aws_s3_bucket" "terraform_state_bucket" {
   bucket = "cozy-terraform-state-bucket"
 
-  versioning {
-    enabled = true
-  }
-
   tags = {
     Name    = "cozy-terraform-state-bucket"
     Creator = "cozy"
+  }
+}
+
+resource "aws_s3_bucket_versioning" "terraform_state_versioning" {
+  bucket = aws_s3_bucket.terraform_state_bucket.id
+
+  versioning_configuration {
+    status = "Enabled"
   }
 }
 
