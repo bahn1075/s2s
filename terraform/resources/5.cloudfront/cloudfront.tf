@@ -1,8 +1,6 @@
 # S3 버킷 생성
 resource "aws_s3_bucket" "cozy_bucket" {
   bucket = "cozy-s3-bucket"
-  acl    = "private"
-
   tags = {
     Name    = "cozy-s3-bucket"
     Creator = "cozy"
