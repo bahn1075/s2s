@@ -43,9 +43,22 @@ resource "aws_route53_record" "gitlab_record" {
   }
 }
 
-# Route 53 레코드 생성 (cloudfront)
+# Route 53 레코드 생성 (CloudFront)
 resource "aws_route53_record" "cloudfront_record" {
   zone_id = aws_route53_zone.cozy_tf_dunn_link.zone_id
+  name    = "cozy.tf-dunn.link"
+  type    = "A"
+
+  alias {
+    name                   = aws_cloudfront_distribution.cozy_distribution.domain_name
+    zone_id                = aws_cloudfront_distribution.cozy_distribution.hosted_zone_id
+    evaluate_target_health = true
+  }
+}
+
+# 기존 호스팅 영역에 CloudFront 레코드 추가
+resource "aws_route53_record" "parent_zone_cloudfront_record" {
+  zone_id = data.aws_route53_zone.parent_zone.id  # 기존 호스팅 영역의 Zone ID를 사용
   name    = "cozy.tf-dunn.link"
   type    = "A"
 
