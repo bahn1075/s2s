@@ -52,7 +52,7 @@ resource "aws_cloudfront_distribution" "cozy_distribution" {
   aliases = ["cozy.tf-dunn.link"]
 
   default_cache_behavior {
-    allowed_methods  = ["GET", "HEAD"]
+    allowed_methods  = ["GET", "HEAD", "OPTIONS","PUT", "POST", "PATCH", "DELETE"]
     cached_methods   = ["GET", "HEAD"]
     target_origin_id = "S3-cozy-s3-bucket"
 
@@ -64,7 +64,7 @@ resource "aws_cloudfront_distribution" "cozy_distribution" {
       }
     }
 
-    viewer_protocol_policy = "redirect-to-https"
+    viewer_protocol_policy = "allow-all"
     min_ttl                = 0
     default_ttl            = 3600
     max_ttl                = 86400
