@@ -1,9 +1,7 @@
 # S3 버킷 생성
 resource "aws_s3_bucket" "cozy_bucket" {
   bucket = "cozy-s3-bucket"
-    lifecycle {
-    ignore_changes = [bucket]
-    }
+
   tags = {
     Name    = "cozy-s3-bucket"
     Creator = "cozy"
@@ -37,7 +35,7 @@ resource "aws_s3_bucket_policy" "cozy_bucket_policy" {
 # CloudFront 배포 생성
 resource "aws_cloudfront_distribution" "cozy_distribution" {
   origin {
-    domain_name = "cozy-s3-bucket.s3.ap-northeast-2.amazonaws.com"
+    domain_name = aws_s3_bucket.cozy_bucket.bucket_regional_domain_name
     origin_id   = "S3-cozy-s3-bucket"
 
     s3_origin_config {
