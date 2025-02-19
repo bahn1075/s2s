@@ -1,3 +1,17 @@
+# ALB 생성
+resource "aws_lb" "cozy_alb" {
+  name               = "cozy-alb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.cozy_cicd_ec2_sg.id]
+  subnets            = [aws_subnet.cozy_public_subnet_a.id, aws_subnet.cozy_public_subnet_b.id]
+
+  tags = {
+    Name    = "cozy-alb"
+    Creator = "cozy"
+  }
+}
+
 # 신규 호스팅 영역 생성
 resource "aws_route53_zone" "cozy_tf_dunn_link" {
   name = "cozy.tf-dunn.link"
@@ -39,6 +53,19 @@ resource "aws_route53_record" "gitlab_record" {
   alias {
     name                   = aws_lb.cozy_alb.dns_name
     zone_id                = aws_lb.cozy_alb.zone_id
+    evaluate_target_health = true
+  }
+}
+
+# Route 53 레코드 생성 (cloudfront)
+resource "aws_route53_record" "cloudfront_record" {
+  zone_id = aws_route53_zone.cozy_tf_dunn_link.zone_id
+  name    = "cozy.tf-dunn.link"
+  type    = "A"
+
+  alias {
+    name                   = aws_cloudfront_distribution.cozy_distribution.domain_name
+    zone_id                = aws_cloudfront_distribution.cozy_distribution.hosted_zone_id
     evaluate_target_health = true
   }
 }
