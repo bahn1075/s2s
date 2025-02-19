@@ -23,7 +23,6 @@ resource "aws_s3_bucket_policy" "cozy_bucket_policy" {
       {
         Effect = "Allow",
         Principal = {
-#          AWS = "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${aws_cloudfront_origin_access_identity.cozy_identity.id}"
           AWS = aws_cloudfront_origin_access_identity.cozy_identity.iam_arn  # ARN 사용
         },
         Action = "s3:GetObject",
@@ -37,7 +36,7 @@ resource "aws_s3_bucket_policy" "cozy_bucket_policy" {
 resource "aws_cloudfront_distribution" "cozy_distribution" {
   origin {
     domain_name = aws_s3_bucket.cozy_bucket.bucket_regional_domain_name
-    origin_id   = "S3-cozy-s3-bucket"
+    origin_id   = aws_s3_bucket.cozy_bucket.id
 
     s3_origin_config {
       origin_access_identity = aws_cloudfront_origin_access_identity.cozy_identity.cloudfront_access_identity_path
@@ -54,7 +53,7 @@ resource "aws_cloudfront_distribution" "cozy_distribution" {
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD", "OPTIONS","PUT", "POST", "PATCH", "DELETE"]
     cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "S3-cozy-s3-bucket"
+    target_origin_id = aws_s3_bucket.cozy_bucket.id
 
     forwarded_values {
       query_string = false
@@ -70,7 +69,7 @@ resource "aws_cloudfront_distribution" "cozy_distribution" {
     max_ttl                = 86400
   }
 
-  price_class = "PriceClass_100"
+  price_class = "PriceClass_All"
 
   restrictions {
     geo_restriction {

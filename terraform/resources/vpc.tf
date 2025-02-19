@@ -1,6 +1,13 @@
-provider "aws" {
-  region = "ap-northeast-2"
+# S3 버킷 생성 (Terraform 상태 파일 저장용)
+resource "aws_s3_bucket" "terraform_state_bucket" {
+  bucket = "cozy-terraform-state-bucket"
+
+  tags = {
+    Name    = "cozy-terraform-state-bucket"
+    Creator = "cozy"
+  }
 }
+
 
 resource "aws_vpc" "cozy_vpc" {
   cidr_block = "10.0.0.0/16"
@@ -135,62 +142,6 @@ resource "aws_instance" "cozy-bastion" {
 
   tags = {
     Name    = "cozy-bastion"
-    Creator = "cozy"
-  }
-}
-
-resource "aws_iam_role" "cozy_ssm_role" {
-  name = "cozy-ssm-role"
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "ec2.amazonaws.com"
-        }
-      }
-    ]
-  })
-  tags = {
-    Creator = "cozy"
-  }
-}
-
-resource "aws_iam_role_policy_attachment" "cozy_ssm_role_policy_attachment" {
-  role       = aws_iam_role.cozy_ssm_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-}
-
-resource "aws_iam_instance_profile" "cozy_ssm_instance_profile" {
-  name = "cozy-ssm-instance-profile"
-  role = aws_iam_role.cozy_ssm_role.name
-  tags = {
-    Creator = "cozy"
-  }
-}
-
-resource "aws_vpc_endpoint" "cozy_ssm_endpoint" {
-  vpc_id            = aws_vpc.cozy_vpc.id
-  service_name      = "com.amazonaws.ap-northeast-2.ssm"
-  vpc_endpoint_type = "Interface"
-  subnet_ids        = [aws_subnet.cozy_private_subnet_a.id, aws_subnet.cozy_private_subnet_b.id]
-  security_group_ids = [aws_security_group.cozy_vpc_sg.id]
-  tags = {
-    Name    = "cozy-ssm-endpoint"
-    Creator = "cozy"
-  }
-}
-
-resource "aws_vpc_endpoint" "cozy_ec2messages_endpoint" {
-  vpc_id            = aws_vpc.cozy_vpc.id
-  service_name      = "com.amazonaws.ap-northeast-2.ec2messages"
-  vpc_endpoint_type = "Interface"
-  subnet_ids        = [aws_subnet.cozy_private_subnet_a.id, aws_subnet.cozy_private_subnet_b.id]
-  security_group_ids = [aws_security_group.cozy_vpc_sg.id]
-  tags = {
-    Name    = "cozy-ec2messages-endpoint"
     Creator = "cozy"
   }
 }

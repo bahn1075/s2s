@@ -22,7 +22,7 @@ data "aws_subnet" "cozy_private_subnet_b" {
 
 # EKS 클러스터 생성
 resource "aws_eks_cluster" "cluster" {
-  name     = "cozy-eks-cluster-tf"
+  name     = "cozy-eks-cluster"
   role_arn = aws_iam_role.eks_role.arn
   version  = "1.32"  # Kubernetes 버전 설정
 

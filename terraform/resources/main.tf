@@ -1,12 +1,7 @@
-# S3 버킷 생성 (Terraform 상태 파일 저장용)
-resource "aws_s3_bucket" "terraform_state_bucket" {
-  bucket = "cozy-terraform-state-bucket"
-
-  tags = {
-    Name    = "cozy-terraform-state-bucket"
-    Creator = "cozy"
-  }
+provider "aws" {
+  region = "ap-northeast-2"
 }
+
 
 resource "aws_s3_bucket_versioning" "terraform_state_versioning" {
   bucket = aws_s3_bucket.terraform_state_bucket.id
