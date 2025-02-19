@@ -18,7 +18,7 @@ resource "aws_s3_bucket_versioning" "terraform_state_versioning" {
 
 # DynamoDB 테이블 생성 (Terraform 상태 잠금용)
 resource "aws_dynamodb_table" "terraform_lock_table" {
-  name         = "terraform-lock-table"
+  name         = "cozy-terraform-lock-table"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "LockID"
 
@@ -28,7 +28,7 @@ resource "aws_dynamodb_table" "terraform_lock_table" {
   }
 
   tags = {
-    Name    = "terraform-lock-table"
+    Name    = "cozy-terraform-lock-table"
     Creator = "cozy"
   }
 }

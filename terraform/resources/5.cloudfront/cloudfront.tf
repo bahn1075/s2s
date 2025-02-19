@@ -1,10 +1,18 @@
 # S3 버킷 생성
 resource "aws_s3_bucket" "cozy_bucket" {
   bucket = "cozy-s3-bucket"
+    lifecycle {
+    ignore_changes = [bucket]
+    }
   tags = {
     Name    = "cozy-s3-bucket"
     Creator = "cozy"
   }
+}
+
+# CloudFront Origin Access Identity 생성
+resource "aws_cloudfront_origin_access_identity" "cozy_identity" {
+  comment = "Cozy CloudFront Origin Access Identity"
 }
 
 # S3 버킷 정책 설정
@@ -29,7 +37,7 @@ resource "aws_s3_bucket_policy" "cozy_bucket_policy" {
 # CloudFront 배포 생성
 resource "aws_cloudfront_distribution" "cozy_distribution" {
   origin {
-    domain_name = aws_s3_bucket.cozy_bucket.bucket_regional_domain_name
+    domain_name = "cozy-s3-bucket.s3.ap-northeast-2.amazonaws.com"
     origin_id   = "S3-cozy-s3-bucket"
 
     s3_origin_config {
@@ -81,11 +89,6 @@ resource "aws_cloudfront_distribution" "cozy_distribution" {
     Name    = "cozy-distribution"
     Creator = "cozy"
   }
-}
-
-# CloudFront Origin Access Identity 생성
-resource "aws_cloudfront_origin_access_identity" "cozy_identity" {
-  comment = "Cozy CloudFront Origin Access Identity"
 }
 
 output "cloudfront_distribution_domain_name" {
