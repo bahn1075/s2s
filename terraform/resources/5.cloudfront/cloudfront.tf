@@ -23,7 +23,8 @@ resource "aws_s3_bucket_policy" "cozy_bucket_policy" {
       {
         Effect = "Allow",
         Principal = {
-          AWS = "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${aws_cloudfront_origin_access_identity.cozy_identity.id}"
+#          AWS = "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${aws_cloudfront_origin_access_identity.cozy_identity.id}"
+          AWS = aws_cloudfront_origin_access_identity.cozy_identity.iam_arn  # ARN 사용
         },
         Action = "s3:GetObject",
         Resource = "${aws_s3_bucket.cozy_bucket.arn}/*"
