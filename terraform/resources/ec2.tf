@@ -55,6 +55,7 @@ resource "aws_security_group" "cozy_cicd_ec2_sg" {
   }
 }
 
+
 # EC2 Jenkins instance
 resource "aws_instance" "cozy-jenkins" {
   ami                    = "ami-0c8dc4d24f067f43d"

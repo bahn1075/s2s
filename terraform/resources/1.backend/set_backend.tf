@@ -1,3 +1,7 @@
+provider "aws" {
+  region = "ap-northeast-2"
+}
+
 # Terraform 백엔드 설정
 terraform {
   backend "s3" {
