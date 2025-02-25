@@ -1,0 +1,52 @@
+pipeline {
+    agent any
+
+    environment {
+        NODEJS_HOME = '/var/jenkins_home/tools/jenkins.plugins.nodejs.tools.NodeJSInstallation/nodejs-23.8.0'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Git 저장소에서 코드 가져오기 (브랜치 이름 변경: master -> main)
+                git branch: 'main', url: 'http://gitlab.cozy.tf-dunn.link/cozy/calculator.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                script {
+                    // Node.js 의존성 설치
+                    sh "${NODEJS_HOME}/bin/npm install"
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                script {
+                    // 프로젝트 빌드
+                    sh "${NODEJS_HOME}/bin/npm run build"
+                }
+            }
+        }
+
+        stage('Start Application') {
+            steps {
+                script {
+                    // 애플리케이션 실행
+                    sh "${NODEJS_HOME}/bin/npm start"
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Build completed successfully!'
+        }
+        failure {
+            echo 'Build failed!'
+        }
+    }
+}

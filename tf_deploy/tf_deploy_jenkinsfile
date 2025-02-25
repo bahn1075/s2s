@@ -1,0 +1,60 @@
+pipeline {
+    agent any
+    
+    environment {
+        // AWS 인증을 위한 환경 변수
+        AWS_REGION = 'ap-northeast-2'
+        ECR_REPO_URL = '151564769076.dkr.ecr.ap-northeast-2.amazonaws.com/cozy-jenkins-repo'
+    }
+    
+    stages {
+        stage('Checkout Code') {
+            steps {
+                // GitLab 저장소에서 코드 가져오기
+                checkout scm
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    // Docker 이미지 빌드
+                    docker.build('cozy-jenkins-repo', '.')
+                }
+            }
+        }
+
+        stage('Login to AWS ECR') {
+            steps {
+                script {
+                    // AWS ECR에 로그인
+                    withAWS(credentials: 'aws-cozy') {
+                        sh '''
+                            $(aws ecr get-login --no-include-email --region ${AWS_REGION})
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Push Docker Image to ECR') {
+            steps {
+                script {
+                    // Docker 이미지를 ECR에 푸시
+                    def imageTag = "latest"
+                    sh """
+                        docker tag cozy-jenkins-repo:latest ${ECR_REPO_URL}:${imageTag}
+                        docker push ${ECR_REPO_URL}:${imageTag}
+                    """
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            // 빌드 후 청소 작업
+            cleanWs()
+        }
+    }
+}
